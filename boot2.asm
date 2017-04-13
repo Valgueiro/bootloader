@@ -23,7 +23,7 @@ printString:
 	call delay 
 	
 	jmp printString
-	
+exit:
 ret
 
 delay: 
