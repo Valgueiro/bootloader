@@ -112,6 +112,7 @@ reset:
 	int 13h			
 	jc reset		;em caso de erro, tenta de novo, 
 
+load_kernel:
 ;Setando a posição do disco onde kernel.asm foi armazenado(ES:BX = [0x7E00:0x0])
 	mov ax,0x7E0	;0x7E0<<1 + 0 = 0x7E00
 	mov es,ax
@@ -127,7 +128,7 @@ reset:
 	mov cl,3		;setor 3
 	mov dh,0		;cabeca 0
 	int 13h
-	jc load_Boot2	;em caso de erro, tenta de novo
+	jc load_kernel	;em caso de erro, tenta de novo
 
 break:	
 	jmp 0x7e00		;Pula para a posição carregada
