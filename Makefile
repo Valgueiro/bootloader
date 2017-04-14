@@ -10,16 +10,15 @@ boot2pos=1
 boot2size=1
 
 # preencha esses valores para rodar o kernel
-kernel=
-kernelpos=
-kernelsize=
+kernel=kernel
+kernelpos=2
+kernelsize=2
 
-ASMFLAGS=-f binx
 file = $(bootdisk)
 
 # adicionem os targets do kernel e do segundo estágio para usar o make all com eles
-#kernel write_kernel
-all: clean mydisk boot1 write_boot1 boot2 write_boot2 hexdump launchqemu
+
+all: clean mydisk boot1 write_boot1 boot2 write_boot2 kernel write_kernel hexdump launchqemu
 
 mydisk: 
 	dd if=/dev/zero of=$(bootdisk) bs=$(blocksize) count=$(disksize) status=noxfer
@@ -31,7 +30,7 @@ boot2:
 	nasm -f bin $(boot2).asm -o $(boot2).bin 
 
 kernel:
-	nasm $(ASMFLAGS) $(kernel).asm -o $(kernel).bin
+	nasm -f bin $(kernel).asm -o $(kernel).bin
 
 write_boot1:
 	dd if=$(boot1).bin of=$(bootdisk) bs=$(blocksize) count=1 conv=notrunc status=noxfer
