@@ -1,253 +1,646 @@
-;Jogo da Velha: ULTRA
+;Jogo
+
 org 0x7E00
 jmp 0x0000:start
 
-titulo db 'Jogo da Velha', 13, 10, $
-ultra db 'ULTRA', 13, 10, $
-iniciar db ' Iniciar Jogo', 13, 10, $
-guia db ' Guia', 13, 10, $
+;Tabuleiro
+pos1 db '-'
+pos2 db '-'
+pos3 db '-'
+pos4 db '-'
+pos5 db '-'
+pos6 db '-'
+pos7 db '-'
+pos8 db '-'
+pos9 db '-'
 
-;Regras:
-introducao db 'O jogo e similar ao Jogo da Velha classico, mas os jogadores agora possuem poderes! Conquiste pontos para conjurar suas habilidades e venca!', 13, 10, $
+;Tabuleiro há 3 turnos atrás.
+pos1A db '-'
+pos2A db '-'
+pos3A db '-'
+pos4A db '-'
+pos5A db '-'
+pos6A db '-'
+pos7A db '-'
+pos8A db '-'
+pos9A db '-'
 
+turno db 1
+pontos1 db 0
+pontos2 db 0
 
 start:
-	; Modo vídeo.
+
+	xor ax, ax
+	mov ds, ax
+
+	;Modo vídeo.
 	mov ah, 0
 	mov al, 12h
 	int 10h
 
-	call telaInicial
+	mov ah, 0xb
+	mov bh, 0
+	mov bl, 7
+	int 10h
+	
+	call printTabuleiro
+
+	turno1:
+		mov ah, 0
+		int 16h
+
+		cmp al, '1'
+		je put1
+
+		cmp al, '2'
+		je put2
+
+		cmp al, '3'
+		je put3
+
+		cmp al, '4'
+		je put4
+
+		cmp al, '5'
+		je put5
+
+		cmp al, '6'
+		je put6
+
+		cmp al, '7'
+		je put7
+	
+		cmp al, '8'
+		je put8
+
+		cmp al, '9'
+		je put9
+
+		cmp al, 'H'
+		je Hack
+
+		cmp al, 'J'
+		je Recall
+
+		cmp al, 'K'
+		je EMP
+
+
+	put1: 
+		mov al, '-'
+		cmp al, byte[pos1]
+		jne turno1 ;Posição já ocupada.
+		
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 7
+		mov dl, 25
+		int 10h
+
+		call TURNO
+		mov byte[pos1], al
+		call PUTCHAR
+	
+		;Verificando adjacências:
+		cmp al, byte[pos5]
+		je acrescenta1
+
+		cmp al, byte[pos4]
+		je acrescenta1
+
+		cmp al, byte[pos2]
+		jne termino1
+
+		acrescenta1: call ACRESCENTA		
+	
+	termino1:
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV	
+	call PUTCHAR
+	jmp exit
+
+	put2: 
+		mov al, '-'
+		cmp al, byte[pos2]
+		jne turno1
+
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 7
+		mov dl, 37
+		int 10h
+		
+		call TURNO
+		mov byte[pos2], al
+		call PUTCHAR	
+
+		;Verificando adjacências:
+		cmp al, byte[pos5]
+		je acrescenta2
+
+		cmp al, byte[pos3]
+		je acrescenta2
+
+		cmp al, byte[pos4]
+		je acrescenta2
+
+		cmp al, byte[pos6]
+		je acrescenta2
+
+		cmp al, byte[pos1]
+		jne termino2
+
+		acrescenta2: call ACRESCENTA		
+	
+	termino2:
+
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV
+	call PUTCHAR
+	jmp exit
+
+	put3: 
+		mov al, '-'
+		cmp al, byte[pos3]
+		jne turno1
+
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 7
+		mov dl, 49
+		int 10h
+		
+		call TURNO
+		mov byte[pos3], al
+		call PUTCHAR
+
+		;Verificando adjacências:
+		cmp al, byte[pos5]
+		je acrescenta3
+
+		cmp al, byte[pos6]
+		je acrescenta3
+
+		cmp al, byte[pos2]
+		jne termino3
+
+		acrescenta3: call ACRESCENTA		
+	
+	termino3:
+
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV
+	call PUTCHAR
+	jmp exit
+
+	put4: 
+		mov al, '-'
+		cmp al, byte[pos4]
+		jne turno1
+
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 12
+		mov dl, 25
+		int 10h
+		
+		call TURNO
+		mov byte[pos4], al
+		call PUTCHAR
+
+		;Verificando adjacências:
+		cmp al, byte[pos5]
+		je acrescenta4
+
+		cmp al, byte[pos1]
+		je acrescenta4
+
+		cmp al, byte[pos7]
+		jne termino4
+
+		acrescenta4: call ACRESCENTA		
+	
+	termino4:
+
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV
+	call PUTCHAR
+	jmp exit
+
+	put5: 
+		mov al, '-'
+		cmp al, byte[pos5]
+		jne turno1
+
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 12
+		mov dl, 37
+		int 10h
+		
+		call TURNO
+		mov byte[pos5], al
+		call PUTCHAR
+
+		;Verificando adjacências:
+		cmp al, byte[pos1]
+		je acrescenta5
+
+		cmp al, byte[pos2]
+		je acrescenta5
+
+		cmp al, byte[pos3]
+		je acrescenta5
+
+		cmp al, byte[pos4]
+		je acrescenta5
+
+		cmp al, byte[pos6]
+		je acrescenta5
+
+		cmp al, byte[pos7]
+		je acrescenta5
+
+		cmp al, byte[pos8]
+		je acrescenta5
+
+		cmp al, byte[pos9]
+		jne termino5
+
+		acrescenta5: call ACRESCENTA		
+	
+	termino5:
+
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV
+	call PUTCHAR
+	jmp exit
+
+	put6: 
+		mov al, '-'
+		cmp al, byte[pos6]
+		jne turno1
+
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 12
+		mov dl, 49
+		int 10h
+		
+		call TURNO
+		mov byte[pos6], al
+		call PUTCHAR
+
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV
+	call PUTCHAR
+	jmp exit
+
+	put7: 
+		mov al, '-'
+		cmp al, byte[pos7]
+		jne turno1
+		
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 17
+		mov dl, 25
+		int 10h
+		
+		call TURNO
+		mov byte[pos7], al
+		call PUTCHAR
+
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV
+	call PUTCHAR
+	jmp exit
+
+	put8:
+		mov al, '-'
+		cmp al, byte[pos8]
+		jne turno1
+
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 17
+		mov dl, 37
+		int 10h
+		
+		call TURNO
+		mov byte[pos8], al
+		call PUTCHAR
+
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV
+	call PUTCHAR
+	jmp exit
+
+	put9:
+		mov al, '-'
+		cmp al, byte[pos9]
+		jne turno1
+
+		;Setando o cursor.
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 17
+		mov dl, 49
+		int 10h
+		
+		call TURNO
+		mov byte[pos9], al
+		call PUTCHAR
+ 	
+	call winCheck
+	cmp dh, 1
+	jne turno1
+	
+	call CURSORV
+	call PUTCHAR
+	jmp exit
+
+	Hack: jmp turno1
+	Recall: jmp turno1
+	EMP: jmp turno1
 
 	jmp exit
 
-telaInicial:
+TURNO:
+	mov al, 1
+	cmp byte[turno], al
+	je X
 
-	;Colorindo a tela de cinza claro.
-	mov ah, 0xb  
-	mov bh, 0     
-	mov bl, 7   
-	int 10h 
+	mov al, 'O'
+	mov byte[turno], 1
+	ret
 
-	;Setando o cursor.
-	mov ah, 02h
-	mov bh, 00h
-	mov dh, 07h
-	mov dl, 20h
-	int 10h
+	X: mov al, 'X'
+	mov byte[turno], 2
+	ret
 
-	mov si, titulo
-	printTitulo:
-		lodsb
-
-		mov ah, 0xe
-		mov bh, 0
-		mov bl, 0xf
-		int 10h
-
-		call delay
-
-		cmp al, 13
-		jne printTitulo
-
-	call animacaoColorida
-
-	call menu	
-			
-ret
-
-menu:
-	mov ah, 02h
-	mov bh, 00h
-	mov dh, 10h
-	mov dl, 10h
-	int 10h
-
+PUTCHAR:
 	mov ah, 0xe
-	mov al, '>'
 	mov bh, 0
 	mov bl, 0xf
 	int 10h
+ret
 
-	mov si, iniciar
-	call printString
+ACRESCENTA:
+	cmp al, 'X'
+	inc byte[pontos1]
+ret
+
+CURSORV:	
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 28
+	mov dl, 37
+	int 10h
+ret
+	
+winCheck:
 
 	mov ah, 02h
 	mov bh, 00h
-	mov dh, 12h
-	mov dl, 11h
+	mov dh, 28
+	mov dl, 25
 	int 10h
 
-	mov si, guia
-	call printString
+	mov al, byte[pontos1]
+	call PUTCHAR
 
-	mov cx, 1 ;CX contém a posição da seta.
-	call mudancaSeta
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 28
+	mov dl, 49
+	int 10h
 
+	mov al, byte[pontos2]
+	call PUTCHAR
 	
-ret
+	linha1:
+	mov al, byte[pos1]
+	mov cl, byte[pos2]
+	mov dl, byte[pos3]
 
-mudancaSeta:
-	
-	mov ah, 0
-	int 16h
+	cmp al, '-'
+	je linha2
 
-	cmp al, 's'
-	je Baixo
+	cmp al, cl
+	jne linha2
 
-	cmp al, 'w'
-	je Cima
+	cmp al, dl
+	jne linha2
 
-	cmp al, 13
-	jne mudancaSeta
-
+	mov dh, 1
 	ret
 
-	Baixo:
-		cmp cx, 2
-		je Cima
+	linha2:
+	mov al, byte[pos4]
+	mov ah, byte[pos5]
+	mov dl, byte[pos6]
 
-		;Os 4 grupos de instruções abaixo deslocam a seta para baixo.
+	cmp al, '-'
+	je linha3
 
-		mov ah, 02h
-		mov bh, 00h
-		mov dh, 10h
-		mov dl, 10h
-		int 10h
+	cmp al, ah
+	jne linha3
 
-		mov ah, 0xe
-		mov al, 0
-		mov bh, 0
-		mov bl, 0xf
-		int 10h
+	cmp al, dl
+	jne linha3
 
-		mov ah, 02h
-		mov bh, 00h
-		mov dh, 12h
-		mov dl, 10h
-		int 10h
+	mov dh, 1
+	ret
 
-		mov ah, 0xe
-		mov al, '>'
-		mov bh, 0
-		mov bl, 0xf
-		int 10h
+	linha3:
+	mov al, byte[pos7]
+	mov ah, byte[pos8]
+	mov dl, byte[pos9]
 
-		mov cx, 2
-		jmp mudancaSeta
+	cmp al, '-'
+	je col1
 
-	Cima:
-		cmp cx, 1
-		je Baixo
+	cmp al, ah
+	jne col1
 
-		;Os 4 grupos de instruções abaixo deslocam a seta para cima.
+	cmp al, dl
+	jne col1
 
-		mov ah, 02h
-		mov bh, 00h
-		mov dh, 10h
-		mov dl, 10h
-		int 10h
+	mov dh, 1
+	ret
 
-		mov ah, 0xe
-		mov al, '>'
-		mov bh, 0
-		mov bl, 0xf
-		int 10h
+	col1:
+	mov al, byte[pos1]
+	mov ah, byte[pos4]
+	mov dl, byte[pos7]
 
-		mov ah, 02h
-		mov bh, 00h
-		mov dh, 12h
-		mov dl, 10h
-		int 10h
+	cmp al, '-'
+	je col2
 
-		mov ah, 0xe
-		mov al, 0
-		mov bh, 0
-		mov bl, 0xf
-		int 10h
+	cmp al, ah
+	jne col2
 
-		mov cx, 1
-		jmp mudancaSeta
+	cmp al, dl
+	jne col2
 
-animacaoColorida:
+	mov dh, 1
+	ret
 
-	;Colorindo a tela de amarelo.
-	mov ah, 0xb  
-	mov bh, 0     
-	mov bl, 0xE   
-	int 10h	
+	col2:
+	mov al, byte[pos2]
+	mov ah, byte[pos5]
+	mov dl, byte[pos8]
 
-	mov ah, 02h
-	mov bh, 00h
-	mov dh, 08h
-	mov dl, 24h
-	int 10h
+	cmp al, '-'
+	je coluna3
 
-	mov bl, 1
-	mov si, ultra
-	call printUltra
-	call delay
+	cmp al, ah
+	jne coluna3
 
-	;Colorindo a tela de azul.
-	mov ah, 0xb  
-	mov bh, 0     
-	mov bl, 1   
-	int 10h
+	cmp al, dl
+	jne coluna3
 
-	mov ah, 02h
-	mov bh, 00h
-	mov dh, 08h
-	mov dl, 24h
-	int 10h
+	mov dh, 1
+	ret
 
-	mov bl, 2
-	mov si, ultra
-	call printUltra
-	call delay
+	coluna3:
+	mov al, byte[pos3]
+	mov ah, byte[pos6]
+	mov dl, byte[pos9]
 
-	;Colorindo a tela de verde.
-	mov ah, 0xb  
-	mov bh, 0     
-	mov bl, 2   
-	int 10h
+	cmp al, '-'
+	je diagonal1
 
-	mov ah, 02h
-	mov bh, 00h
-	mov dh, 08h
-	mov dl, 24h
-	int 10h
+	cmp al, ah
+	jne diagonal1
 
-	mov bl, 4
-	mov si, ultra
-	call printUltra
-	call delay
+	cmp al, dl
+	jne diagonal1
 
-	;Colorindo a tela de vermelho (fim).
-	mov ah, 0xb  
-	mov bh, 0     
-	mov bl, 4   
-	int 10h
+	mov dh, 1
+	ret
 
-	mov ah, 02h
-	mov bh, 00h
-	mov dh, 08h
-	mov dl, 24h
-	int 10h
+	diagonal1:
+	mov al, byte[pos1]
+	mov ah, byte[pos5]
+	mov dl, byte[pos9]
 
-	mov bl, 0xe
-	mov si, ultra
-	call printUltra
+	cmp al, '-'
+	je diagonal2
+
+	cmp al, ah
+	jne diagonal2
+
+	cmp al, dl
+	jne diagonal2
+
+	mov dh, 1
+	ret
+
+	diagonal2:
+	mov al, byte[pos3]
+	mov ah, byte[pos5]
+	mov dl, byte[pos7]
+
+	cmp al, '-'
+	je retorna
+
+	cmp al, ah
+	jne retorna
+
+	cmp al, dl
+	jne retorna
+
+	mov dh, 1
+	retorna:
 ret
 
-printUltra:
-	lodsb
-
-	mov ah, 0xe
+printTabuleiro:
+	
+	;Printando as colunas...
+	mov dx, 80
+	coluna1:
+	mov ah, 0Ch
 	mov bh, 0
-	int 10h
+	mov al, 0xf
+	mov cx, 250	
+	int 10h	
 
-	cmp al, 13
-	jne printUltra
+	inc dx
+	cmp dx, 320
+	jne coluna1
+
+	mov dx, 80
+	coluna2:
+	mov ah, 0Ch
+	mov bh, 0
+	mov al, 0xf
+	mov cx, 350	
+	int 10h	
+
+	inc dx
+	cmp dx, 320
+	jne coluna2
+
+	;Printando as linhas...
+	mov cx, 160
+	l1:
+	mov ah, 0Ch
+	mov bh, 0
+	mov al, 0xf
+	mov dx, 160	
+	int 10h	
+
+	inc cx
+	cmp cx, 450
+	jne l1
+
+	mov cx, 160
+	l2:
+	mov ah, 0Ch
+	mov bh, 0
+	mov al, 0xf
+	mov dx, 240	
+	int 10h	
+
+	inc cx
+	cmp cx, 450
+	jne l2	
+
 ret
 
 printString:
@@ -262,20 +655,6 @@ printString:
 	jne printString
 ret
 
-delay:
-	mov bp, 1000
-	mov dx, 750
-	delay2:
-		dec bp
-		nop
-		jnz delay2
-	dec dx
-	jnz delay2
-
-ret
-
-
 exit:
-;times 1022 -($-$$) db 0
-;dw 0xaa55
+
 
