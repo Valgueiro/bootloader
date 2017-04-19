@@ -1,5 +1,5 @@
 bits 16
-org 0x7C00
+org 0x7C00; (offset)0x7c000 + 0x0000
 jmp 0x0000:start; garantir cs == 0x0000
 
 start:

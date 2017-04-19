@@ -1,6 +1,6 @@
 ;Jogo
 
-org 0x7E00
+org 0x8600
 jmp 0x0000:start
 
 ;Tabuleiro
@@ -28,6 +28,10 @@ pos9A db '-'
 turno db 1
 pontos1 db 0
 pontos2 db 0
+
+Hacking db 'Iniciando o hack!', 13
+Recalling db 'Voce ja sentiu a sensacao de dejavu?', 13
+EMPing db 'Apagando as luzes!', 13
 
 start:
 
@@ -77,13 +81,13 @@ start:
 		cmp al, '9'
 		je put9
 
-		cmp al, 'H'
+		cmp al, 'h'
 		je Hack
 
-		cmp al, 'J'
+		cmp al, 'j'
 		je Recall
 
-		cmp al, 'K'
+		cmp al, 'k'
 		je EMP
 
 
@@ -111,19 +115,12 @@ start:
 		je acrescenta1
 
 		cmp al, byte[pos2]
-		jne termino1
+		jne termino
 
-		acrescenta1: call ACRESCENTA		
-	
-	termino1:
-	call winCheck
-	cmp dh, 1
-	jne turno1
-	
-	call CURSORV	
-	call PUTCHAR
-	jmp exit
+		acrescenta1: call ACRESCENTA
 
+	jmp termino		
+	
 	put2: 
 		mov al, '-'
 		cmp al, byte[pos2]
@@ -154,20 +151,12 @@ start:
 		je acrescenta2
 
 		cmp al, byte[pos1]
-		jne termino2
+		jne termino
 
-		acrescenta2: call ACRESCENTA		
+		acrescenta2: call ACRESCENTA
+
+	jmp termino		
 	
-	termino2:
-
-	call winCheck
-	cmp dh, 1
-	jne turno1
-	
-	call CURSORV
-	call PUTCHAR
-	jmp exit
-
 	put3: 
 		mov al, '-'
 		cmp al, byte[pos3]
@@ -192,19 +181,11 @@ start:
 		je acrescenta3
 
 		cmp al, byte[pos2]
-		jne termino3
+		jne termino
 
-		acrescenta3: call ACRESCENTA		
-	
-	termino3:
+		acrescenta3: call ACRESCENTA	
 
-	call winCheck
-	cmp dh, 1
-	jne turno1
-	
-	call CURSORV
-	call PUTCHAR
-	jmp exit
+	jmp termino	
 
 	put4: 
 		mov al, '-'
@@ -229,21 +210,19 @@ start:
 		cmp al, byte[pos1]
 		je acrescenta4
 
+		cmp al, byte[pos2]
+		je acrescenta4
+
+		cmp al, byte[pos8]
+		je acrescenta4
+
 		cmp al, byte[pos7]
-		jne termino4
+		jne termino
 
-		acrescenta4: call ACRESCENTA		
+		acrescenta4: call ACRESCENTA	
+
+	jmp termino	
 	
-	termino4:
-
-	call winCheck
-	cmp dh, 1
-	jne turno1
-	
-	call CURSORV
-	call PUTCHAR
-	jmp exit
-
 	put5: 
 		mov al, '-'
 		cmp al, byte[pos5]
@@ -283,20 +262,12 @@ start:
 		je acrescenta5
 
 		cmp al, byte[pos9]
-		jne termino5
+		jne termino
 
-		acrescenta5: call ACRESCENTA		
+		acrescenta5: call ACRESCENTA
+
+	jmp termino		
 	
-	termino5:
-
-	call winCheck
-	cmp dh, 1
-	jne turno1
-	
-	call CURSORV
-	call PUTCHAR
-	jmp exit
-
 	put6: 
 		mov al, '-'
 		cmp al, byte[pos6]
@@ -313,14 +284,26 @@ start:
 		mov byte[pos6], al
 		call PUTCHAR
 
-	call winCheck
-	cmp dh, 1
-	jne turno1
-	
-	call CURSORV
-	call PUTCHAR
-	jmp exit
+		;Verificando adjacências:
+		cmp al, byte[pos5]
+		je acrescenta6
 
+		cmp al, byte[pos3]
+		je acrescenta6
+
+		cmp al, byte[pos2]
+		je acrescenta6
+
+		cmp al, byte[pos8]
+		je acrescenta6
+
+		cmp al, byte[pos9]
+		jne termino
+
+		acrescenta6: call ACRESCENTA
+	
+	jmp termino		
+	
 	put7: 
 		mov al, '-'
 		cmp al, byte[pos7]
@@ -337,14 +320,20 @@ start:
 		mov byte[pos7], al
 		call PUTCHAR
 
-	call winCheck
-	cmp dh, 1
-	jne turno1
-	
-	call CURSORV
-	call PUTCHAR
-	jmp exit
+		;Verificando adjacências:
+		cmp al, byte[pos5]
+		je acrescenta7
 
+		cmp al, byte[pos4]
+		je acrescenta7
+
+		cmp al, byte[pos8]
+		jne termino
+
+		acrescenta7: call ACRESCENTA
+
+	jmp termino		
+	
 	put8:
 		mov al, '-'
 		cmp al, byte[pos8]
@@ -361,14 +350,26 @@ start:
 		mov byte[pos8], al
 		call PUTCHAR
 
-	call winCheck
-	cmp dh, 1
-	jne turno1
-	
-	call CURSORV
-	call PUTCHAR
-	jmp exit
+		;Verificando adjacências:
+		cmp al, byte[pos5]
+		je acrescenta8
 
+		cmp al, byte[pos4]
+		je acrescenta8
+
+		cmp al, byte[pos7]
+		je acrescenta8
+
+		cmp al, byte[pos6]
+		je acrescenta8
+
+		cmp al, byte[pos9]
+		jne termino
+
+		acrescenta8: call ACRESCENTA
+
+	jmp termino		
+	
 	put9:
 		mov al, '-'
 		cmp al, byte[pos9]
@@ -384,6 +385,20 @@ start:
 		call TURNO
 		mov byte[pos9], al
 		call PUTCHAR
+
+		;Verificando adjacências:
+		cmp al, byte[pos5]
+		je acrescenta9
+
+		cmp al, byte[pos6]
+		je acrescenta9
+
+		cmp al, byte[pos8]
+		jne termino
+
+		acrescenta9: call ACRESCENTA		
+	
+	termino:
  	
 	call winCheck
 	cmp dh, 1
@@ -393,11 +408,177 @@ start:
 	call PUTCHAR
 	jmp exit
 
-	Hack: jmp turno1
-	Recall: jmp turno1
-	EMP: jmp turno1
+	Hack:
+		mov al, byte[turno]
+		cmp al, 1 ; X conjurou.
+		je xVerify
+	
+		;O conjurou.
+		mov dl, byte[pontos2]
+		sub dl, 1
+		cmp dl, 0
+		jl turno1 ; -O- não tem pelo menos 1 ponto para conjurar Hackear.
 
-	jmp exit
+		jmp hackExec
+
+		xVerify:
+		mov dl, byte[pontos1]
+		sub dl, 2
+		cmp dl, 0
+		jl turno1 ; -X- não tem pelo menos 2 pontos para conjurar Hackear.
+
+		hackExec:
+
+		;Atualizando os pontos.
+		call atualizaPontos
+
+		;Mudando a cor da tela.
+		mov ah, 0xb
+		mov bh, 0
+		mov bl, 5
+		int 10h
+	
+		;Setando o cursor;
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 26
+		mov dl, 29
+		int 10h
+
+		;Printando a frase.
+		mov si, Hacking
+		call printString
+
+		;Algoritmo (não veja isso se não quiser perder a sensação de hacker!):
+
+		;Minha ideia (be free to change):
+		;Primeira coluna rotacionada para cima.
+		;Segunda coluna rotacionada para baixo.
+		;2 primeiras linhas deslocadas para a esquerda.
+		;3ª linha deslocada para a direita.
+		;9º elemento apagado.
+
+		;falta implementar a função que atualiza o tabuleiro.
+		
+
+	 jmp termino
+	Recall:
+		mov al, byte[turno]
+		cmp al, 1 ; X conjurou.
+		je xVerify2
+	
+		; O conjurou.
+		mov dl, byte[pontos2]
+		sub dl, 2
+		cmp dl, 0
+		jl turno1 ; -O- não tem pelo menos 2 pontos para conjurar Retroceder.
+
+		jmp recallExec
+
+		xVerify2:
+		mov dl, byte[pontos1]
+		sub dl, 3
+		cmp dl, 0
+		jl turno1 ; -X- não tem pelo menos 3 pontos para conjurar Retroceder.
+
+		recallExec:
+
+		;Atualizando os pontos.
+		call atualizaPontos
+
+		;Mudando a cor da tela.
+		mov ah, 0xb
+		mov bh, 0
+		mov bl, 3
+		int 10h
+	
+		;Setando o cursor;
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 26
+		mov dl, 19
+		int 10h		
+		
+		;Printando a frase.
+		mov si, Recalling
+		call printString
+
+		;Retroceder: o tabuleiro volta ao seu estado três turnos atrás.
+		;falta implementar um contador pra os turnos, aí é só colocar posx em posxA sempre a partir do 3º.
+		;recall coloca posxA em posx para todas as peças e atualiza o tabuleiro.
+		
+
+	jmp termino
+
+	EMP: 
+		mov al, byte[turno]
+		cmp al, 1 ; X conjurou.
+		je xVerify3
+	
+		; O conjurou.
+		mov dl, byte[pontos2]
+		sub dl, 2
+		cmp dl, 0
+		jl turno1 ; -O- não tem pelo menos 2 pontos para conjurar Pulso Eletromagnético.
+
+		jmp EMPExec
+
+		xVerify3:
+		mov dl, byte[pontos1]
+		sub dl, 3
+		cmp dl, 0
+		jl turno1 ; -X- não tem pelo menos 3 pontos para conjurar Pulso Eletromagnético.
+
+		EMPExec:
+
+		;Atualizando os pontos.
+		call atualizaPontos
+
+		;Mudando a cor da tela.
+		mov ah, 0xb
+		mov bh, 0
+		mov bl, 0
+		int 10h
+	
+		;Setando o cursor;
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 26
+		mov dl, 29
+		int 10h		
+		
+		;Printando a frase.
+		mov si, EMPing
+		call printString
+
+		;Pulso Eletromagnético:
+		;1º passo: a fronteira do tabuleiro "é apagada" (fica só invisível, mas o oponente pode colocar uma peça em qualquer lugar). 	
+		;2º passo: as peças na fronteira são trocadas (X vira O, O vira X).
+		;3º passo: as peças voltam a ser visíveis e o ritmo segue.
+		;O 1º passo dura o próximo turno inteiro, então precisamos trocar o turno (chamar TURNO) e fazer uma chamada de turno1 aqui (colocando ret nele).
+
+	call TURNO
+	jmp termino 
+
+atualizaPontos:
+	cmp al, 1
+	je xPontos
+
+	mov byte[pontos2], dl
+	ret
+
+	xPontos:
+	mov byte[pontos1], dl
+ret
+
+printString:
+	lodsb
+
+	call PUTCHAR
+
+	cmp al, 13
+	jne printString
+ret
 
 TURNO:
 	mov al, 1
@@ -421,6 +602,12 @@ ret
 
 ACRESCENTA:
 	cmp al, 'X'
+	je acrX
+
+	inc byte[pontos2]
+	ret
+
+	acrX:
 	inc byte[pontos1]
 ret
 
@@ -441,6 +628,7 @@ winCheck:
 	int 10h
 
 	mov al, byte[pontos1]
+	add al, 48
 	call PUTCHAR
 
 	mov ah, 02h
@@ -450,6 +638,7 @@ winCheck:
 	int 10h
 
 	mov al, byte[pontos2]
+	add al, 48
 	call PUTCHAR
 	
 	linha1:
@@ -643,17 +832,17 @@ printTabuleiro:
 
 ret
 
-printString:
-	lodsb
+;printString:
+;	lodsb
 
-	mov ah, 0xe
-	mov bh, 0
-	mov bl, 0xf
-	int 10h
+;	mov ah, 0xe
+;	mov bh, 0
+;	mov bl, 0xf
+;	int 10h
 
-	cmp al, 13
-	jne printString
-ret
+;	cmp al, 13
+;	jne printString
+;ret
 
 exit:
 
