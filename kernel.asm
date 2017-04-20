@@ -1260,6 +1260,25 @@ printTabuleiro:
 	cmp cx, 450
 	jne l2	
 
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 27
+	mov dl, 25
+	int 10h
+	
+	mov al, 'X'
+	call PUTCHAR 
+
+
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 27
+	mov dl, 49
+	int 10h
+	
+	mov al, 'O'
+	call PUTCHAR
+
 ret
 
 delay:
@@ -1281,7 +1300,7 @@ turnoSeta:
 	
 	mov ah, 02h
 	mov bh, 00h
-	mov dh, 28
+	mov dh, 27
 	mov dl, 23
 	int 10h
 
@@ -1290,7 +1309,7 @@ turnoSeta:
 
 	mov ah, 02h
 	mov bh, 00h
-	mov dh, 28
+	mov dh, 27
 	mov dl, 47
 	int 10h
 
@@ -1301,7 +1320,7 @@ turnoSeta:
 	turnoO:
 	mov ah, 02h
 	mov bh, 00h
-	mov dh, 28
+	mov dh, 27
 	mov dl, 47
 	int 10h
 
@@ -1310,7 +1329,7 @@ turnoSeta:
 	
 	mov ah, 02h
 	mov bh, 00h
-	mov dh, 28
+	mov dh, 27
 	mov dl, 23
 	int 10h
 
@@ -1321,7 +1340,7 @@ ret
 opcao:
 	mov ah, 02h
 	mov bh, 00h
-	mov dh, 28
+	mov dh, 27
 	mov dl, 23
 	int 10h
 
@@ -1330,14 +1349,22 @@ opcao:
 
 	mov ah, 02h
 	mov bh, 00h
-	mov dh, 28
+	mov dh, 27
 	mov dl, 47
 	int 10h
 
 	mov al, ' '
 	call PUTCHAR	
 	
-	;Setando o cursor.
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 26; linha
+	mov dl, 19
+	int 10h
+
+	mov si, neutra
+	call printString
+
 	mov ah, 02h
 	mov bh, 00h
 	mov dh, 26; linha
