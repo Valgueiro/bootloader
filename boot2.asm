@@ -118,9 +118,9 @@ load_kernel:
 	mov es,ax
 	xor bx,bx		;Zerando o offset
 
-;Setando a posição da Ram onde o Kernel será lido
+;Setando a posição da Ram onde o menu será lido
 	mov ah, 0x02	;comando de ler setor do disco
-	mov al,4		;quantidade de blocos ocupados pelo Kernel
+	mov al,4		;quantidade de blocos ocupados pelo menu
 	mov dl,0		;drive floppy
 
 ;Usaremos as seguintes posições na memoria:

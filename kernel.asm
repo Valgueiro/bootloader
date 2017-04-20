@@ -24,11 +24,13 @@ turno db 1
 pontos1 db 0
 pontos2 db 0
 
-Hacking db 'Iniciando o hack!', 13
-Recalling db 'Voce ja sentiu a sensacao de dejavu?', 13
+Hacking db 'Iniciando o hack...', 13
+Hacked db 'Tabuleiro hackeado!', 13
+Recalling db 'Voce ja sentiu a sensacao de... dejavu?', 13
 EMPing db 'Apagando as luzes!', 13
-Retorno db '> Voltar ao menu inicial', 13
+neutra db '                                       ', 13
 
+Retorno db '> Jogar novamente', 13
 start:
 
 	xor ax, ax
@@ -46,7 +48,9 @@ start:
 	
 	call printTabuleiro
 
-	turno1:		
+	turno1:	
+		call turnoSeta	
+	
 		mov ah, 0
 		int 16h
 
@@ -437,12 +441,8 @@ start:
 	
 	termino:
 
-	;cmp ch, 1 ;Ativei Retroceder, não preciso dar push nos tabuleiros.
-;	je RECALL_continue
-
 	call RECALL_Tabuleiros ;Atualizando os tabuleiros.	
 
-	RECALL_continue:
 	cmp ch, 2 ;Estou no fim do turno pós-ativação de EMP.
 	je EMP_volta
 
@@ -454,8 +454,7 @@ start:
 	
 	call CURSORV
 	call PUTCHAR
-	call opcao
-	jmp exit
+	jmp opcao
 
 	Hack:
 		mov al, byte[turno]
@@ -464,7 +463,7 @@ start:
 	
 		;O conjurou.
 		mov dl, byte[pontos2]
-		sub dl, 1
+		sub dl, 0
 		cmp dl, 0
 		jl turno1 ; -O- não tem pelo menos 1 ponto para conjurar Hackear.
 
@@ -472,7 +471,7 @@ start:
 
 		xVerify:
 		mov dl, byte[pontos1]
-		sub dl, 2
+		sub dl, 0
 		cmp dl, 0
 		jl turno1 ; -X- não tem pelo menos 2 pontos para conjurar Hackear.
 
@@ -486,12 +485,23 @@ start:
 		mov bh, 0
 		mov bl, 5
 		int 10h
+
+		;Setando o cursor;
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 26
+		mov dl, 19
+		int 10h
+
+		;Zerando a frase.
+		mov si, neutra
+		call printString
 	
 		;Setando o cursor;
 		mov ah, 02h
 		mov bh, 00h
 		mov dh, 26
-		mov dl, 29
+		mov dl, 28
 		int 10h
 
 		;Printando a frase.
@@ -500,15 +510,45 @@ start:
 
 		;Algoritmo (não veja isso se não quiser perder a sensação de hacker!):
 
-		;Minha ideia (be free to change):
 		;Primeira coluna rotacionada para cima.
-		;Segunda coluna rotacionada para baixo.
-		;2 primeiras linhas deslocadas para a esquerda.
-		;3ª linha deslocada para a direita.
-		;9º elemento apagado.
-
-		;falta implementar a função que atualiza o tabuleiro.
+		call HACK_Rot1Up
 		
+		call atualizaTabuleiro
+		call delay
+
+		;Segunda coluna rotacionada para baixo.
+		call HACK_Rot2Down
+
+		call atualizaTabuleiro
+		call delay
+
+		;Primeira linha rotacionada para a direita.
+		call HACK_Rot1Right	
+
+		call atualizaTabuleiro
+		call delay	
+	
+		;3ª rotacionada para a esquerda.
+		call HACK_Rot3Left
+
+		call atualizaTabuleiro
+		call delay
+		
+		;Elemento do centro apagado.
+		mov byte[pos5], '-'
+
+		call atualizaTabuleiro
+
+		;Setando o cursor;
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 26
+		mov dl, 28
+		int 10h
+
+		;Printando a frase.
+		mov si, Hacked
+		call printString		
 
 	 jmp termino
 
@@ -520,15 +560,15 @@ start:
 		; O conjurou.
 		mov dl, byte[pontos2]
 		sub dl, 0
-		cmp dl, 0
-		jl turno1 ; -O- não tem pelo menos 2 pontos para conjurar Retroceder.
+		cmp dl, 1
+		jl turno1 ; -O- não tem pelo menos 1 ponto para conjurar Retroceder.
 
 		jmp recallExec
 
 		xVerify2:
 		mov dl, byte[pontos1]
 		sub dl, 0
-		cmp dl, 0
+		cmp dl, 1
 		jl turno1 ; -X- não tem pelo menos 3 pontos para conjurar Retroceder.
 
 		recallExec:
@@ -541,7 +581,7 @@ start:
 		mov bh, 0
 		mov bl, 3
 		int 10h
-	
+
 		;Setando o cursor;
 		mov ah, 02h
 		mov bh, 00h
@@ -573,7 +613,7 @@ start:
 		; O conjurou.
 		mov dl, byte[pontos2]
 		sub dl, 0
-		cmp dl, 0
+		cmp dl, 2
 		jl turno1 ; -O- não tem pelo menos 2 pontos para conjurar Pulso Eletromagnético.
 
 		jmp EMPExec
@@ -581,7 +621,7 @@ start:
 		xVerify3:
 		mov dl, byte[pontos1]
 		sub dl, 0
-		cmp dl, 0
+		cmp dl, 3
 		jl turno1 ; -X- não tem pelo menos 3 pontos para conjurar Pulso Eletromagnético.
 
 		EMPExec:
@@ -594,6 +634,17 @@ start:
 		mov bh, 0
 		mov bl, 0
 		int 10h
+
+		;Setando o cursor;
+		mov ah, 02h
+		mov bh, 00h
+		mov dh, 26
+		mov dl, 19
+		int 10h
+
+		;Zerando a frase.
+		mov si, neutra
+		call printString
 	
 		;Setando o cursor;
 		mov ah, 02h
@@ -731,6 +782,59 @@ atualizaTabuleiro:
 ret
 
 ;HABILIDADES
+
+HACK_Rot1Up:
+	mov al, byte[pos1]
+	mov dl, byte[pos7]
+	mov cl, byte[pos4]
+	
+	;1 pra 7.
+	mov byte[pos7], al
+	;7 pra 4.
+	mov byte[pos4], dl
+	;4 pra 1.
+	mov byte[pos1], cl
+ret
+
+HACK_Rot2Down:
+	mov al, byte[pos2]
+	mov dl, byte[pos5]
+	mov cl, byte[pos8]
+	
+	;2 pra 5.
+	mov byte[pos5], al
+	;5 pra 8.
+	mov byte[pos8], dl
+	;8 pra 2.
+	mov byte[pos2], cl
+ret
+
+HACK_Rot1Right:
+	mov al, byte[pos1]
+	mov dl, byte[pos2]
+	mov cl, byte[pos3]
+
+	;1 para 2.	
+	mov byte[pos2], al
+	;2 para 3.
+	mov byte[pos3], dl
+	;3 para 1.
+	mov byte[pos1], cl
+ret
+
+HACK_Rot3Left:
+	mov al, byte[pos7]
+	mov dl, byte[pos8]
+	mov cl, byte[pos9]
+
+	;9 para 8.	
+	mov byte[pos8], cl
+	;8 para 7.
+	mov byte[pos7], dl
+	;7 para 9.
+	mov byte[pos9], al
+ret
+
 
 RECALL_Tabuleiros:
 
@@ -1158,21 +1262,98 @@ printTabuleiro:
 
 ret
 
+delay:
+	mov bp, 850
+	mov dx, 850
+	delay2:
+		dec bp
+		nop
+		jnz delay2
+	dec dx
+	jnz delay2
+
+ret
+
+turnoSeta:
+	mov bl, byte[turno]
+	cmp bl, 2 ;O
+	je turnoO
+	
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 28
+	mov dl, 23
+	int 10h
+
+	mov al, '>'
+	call PUTCHAR
+
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 28
+	mov dl, 47
+	int 10h
+
+	mov al, ' '
+	call PUTCHAR
+	ret
+
+	turnoO:
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 28
+	mov dl, 47
+	int 10h
+
+	mov al, '>'
+	call PUTCHAR
+	
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 28
+	mov dl, 23
+	int 10h
+
+	mov al, ' '
+	call PUTCHAR
+ret
+
 opcao:
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 28
+	mov dl, 23
+	int 10h
+
+	mov al, ' '
+	call PUTCHAR
+
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, 28
+	mov dl, 47
+	int 10h
+
+	mov al, ' '
+	call PUTCHAR	
+	
 	;Setando o cursor.
 	mov ah, 02h
 	mov bh, 00h
-	mov dh, 25
-	mov dl, 25
+	mov dh, 26; linha
+	mov dl, 29
 	int 10h
 
 	mov si, Retorno
 	call printString
 	
-	mov ah, 0
-	int 16h
+	esperaEnter:
+		mov ah, 0
+		int 16h
+			
+		cmp al, 13
+		jne esperaEnter
 
-	cmp al, 13
 	je retornoParaMenu
 
 ret
@@ -1203,11 +1384,8 @@ retornoParaMenu:
 
 	mov byte[turno], 1
 	mov byte[pontos1], 0
-	mov byte[pontos2], 1
+	mov byte[pontos2], 0	
 
-	jmp 0x7e00
+	jmp 0x8600
 
 exit:
-
-
-

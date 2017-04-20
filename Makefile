@@ -17,7 +17,7 @@ menusize=4
 # preencha esses valores para rodar o kernel
 kernel=kernel
 kernelpos=6
-kernelsize=4
+kernelsize=8
 
 file = $(bootdisk)
 

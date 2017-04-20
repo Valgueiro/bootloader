@@ -514,14 +514,14 @@ delay:
 ret
 
 jogo:
-;Setando a posição do disco onde boot2.asm foi armazenado(ES:BX = [0x500:0x0])
+;Setando a posição do disco onde kernel.asm foi armazenado(ES:BX = [0x500:0x0])
 	mov ax,0x860		;0x50<<1 + 0 = 0x500
 	mov es,ax
 	xor bx,bx		;Zerando o offset
 
-;Setando a posição da Ram onde o boot2 será lido
+;Setando a posição da Ram onde o jogo será lido
 	mov ah, 0x02	;comando de ler setor do disco
-	mov al,4		;quantidade de blocos ocupados por boot2
+	mov al,8		;quantidade de blocos ocupados por jogo
 	mov dl,0		;drive floppy
 
 ;Usaremos as seguintes posições na memoria:
@@ -536,6 +536,3 @@ break:
 
 
 exit:
-;times 1022 -($-$$) db 0
-;dw 0xaa55
-
