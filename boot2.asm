@@ -112,7 +112,7 @@ reset:
 	int 13h			
 	jc reset		;em caso de erro, tenta de novo, 
 
-load_kernel:
+load_menu:
 ;Setando a posição do disco onde kernel.asm foi armazenado(ES:BX = [0x7E00:0x0])
 	mov ax,0x7E0	;0x7E0<<1 + 0 = 0x7E00
 	mov es,ax
@@ -128,13 +128,12 @@ load_kernel:
 	mov cl,3		;setor 3
 	mov dh,0		;cabeca 0
 	int 13h
-	jc load_kernel	;em caso de erro, tenta de novo
+	jc load_menu	;em caso de erro, tenta de novo
 
 break:	
 	jmp 0x7e00		;Pula para a posição carregada
 
-times 510-($-$$) db 0		; preenche o resto do setor com zeros 
-dw 0xaa55					; coloca a assinatura de boot no final
-							; do setor (x86 : little endian)
+times 510-($-$$) db 0		
+dw 0xaa55					
 
 

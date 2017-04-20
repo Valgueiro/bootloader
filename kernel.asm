@@ -463,7 +463,7 @@ start:
 	
 		;O conjurou.
 		mov dl, byte[pontos2]
-		sub dl, 0
+		sub dl, 1
 		cmp dl, 0
 		jl turno1 ; -O- não tem pelo menos 1 ponto para conjurar Hackear.
 
@@ -471,7 +471,7 @@ start:
 
 		xVerify:
 		mov dl, byte[pontos1]
-		sub dl, 0
+		sub dl, 2
 		cmp dl, 0
 		jl turno1 ; -X- não tem pelo menos 2 pontos para conjurar Hackear.
 
@@ -559,16 +559,16 @@ start:
 	
 		; O conjurou.
 		mov dl, byte[pontos2]
-		sub dl, 0
-		cmp dl, 1
+		sub dl, 2
+		cmp dl, 0
 		jl turno1 ; -O- não tem pelo menos 1 ponto para conjurar Retroceder.
 
 		jmp recallExec
 
 		xVerify2:
 		mov dl, byte[pontos1]
-		sub dl, 0
-		cmp dl, 1
+		sub dl, 3
+		cmp dl, 0
 		jl turno1 ; -X- não tem pelo menos 3 pontos para conjurar Retroceder.
 
 		recallExec:
@@ -612,16 +612,16 @@ start:
 	
 		; O conjurou.
 		mov dl, byte[pontos2]
-		sub dl, 0
-		cmp dl, 2
+		sub dl, 1
+		cmp dl, 0
 		jl turno1 ; -O- não tem pelo menos 2 pontos para conjurar Pulso Eletromagnético.
 
 		jmp EMPExec
 
 		xVerify3:
 		mov dl, byte[pontos1]
-		sub dl, 0
-		cmp dl, 3
+		sub dl, 1
+		cmp dl, 0
 		jl turno1 ; -X- não tem pelo menos 3 pontos para conjurar Pulso Eletromagnético.
 
 		EMPExec:

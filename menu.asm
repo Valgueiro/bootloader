@@ -14,21 +14,20 @@ pontos db 'Obtenha pontos para conjurar habilidades e derrote seu oponente!', 13
 tituloObjetivo db 'OBJETIVO: ', 13
 objetivo db 'Coloque 3 pecas adjacentes para vencer.', 13
 tituloJogabilidade db 'JOGABILIDADE:', 13
-jogabilidade1 db '> W/A/S/D para mover o cursor e ENTER para colocar a peca.', 13
+jogabilidade1 db '> Digite de 1-9 para ver o que acontece', 13
 jogabilidade2 db '> Colocar uma peca encerra o turno.', 13
 jogabilidade3 db '> Colocar 2 pecas adjacentes concede 1 ponto ao jogador.', 13
 jogabilidade4 db '> PONTOS sao consumidos ao conjurar habilidades para modificar o tabuleiro.', 13
 tituloHabilidades db 'HABILIDADES:', 13
-tituloHack db 'HACKEAR', 13
+tituloHack db 'H - HACKEAR', 13
 hack db 'Hackeia o tabuleiro, modificando-o aleatoriamente e encerra o turno.', 13
-custoHack db '- 2', 13
-tituloRecall db 'RETROCEDER', 13
+custoHack db '- 2 , 1', 13
+tituloRecall db 'J - RETROCEDER', 13
 recall db 'Retorna o tabuleiro ao seu estado 3 turnos atras.', 13
-custoRecall db '- 3', 13
-tituloPEM db 'PULSO ELETROMAGNETICO', 13
+custoRecall db '- 3 , 2', 13
+tituloPEM db 'K - PULSO ELETROMAGNETICO', 13
 PEM db 'Libera um pulso que troca as pecas na fronteira do tabuleiro.', 13, 10, $
-custoPEM db '- 3', 13
-
+custoPEM db '- 1 , 1', 13
 
 
 start:
@@ -201,7 +200,7 @@ telaInicial:
 		mov ah, 02h
 		mov bh, 00h
 		mov dh, 19
-		mov dl, 13
+		mov dl, 17
 		int 10h
 		mov si, custoHack
 		mov bl, 0xe
@@ -228,7 +227,7 @@ telaInicial:
 		mov ah, 02h
 		mov bh, 00h
 		mov dh, 22
-		mov dl, 16
+		mov dl, 20
 		int 10h
 		mov si, custoRecall
 		mov bl, 0xe
@@ -255,7 +254,7 @@ telaInicial:
 		mov ah, 02h
 		mov bh, 00h
 		mov dh, 25
-		mov dl, 27
+		mov dl, 31
 		int 10h
 		mov si, custoPEM
 		mov bl, 0xe
