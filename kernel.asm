@@ -1182,7 +1182,7 @@ retornoParaMenu:
 	mov byte[pos1], '-'
 	mov byte[pos2], '-'
 	mov byte[pos3], '-'
-	mov byte[pos4],'-'
+	mov byte[pos4], '-'
 	mov byte[pos5], '-'
 	mov byte[pos6], '-'
 	mov byte[pos7], '-'
